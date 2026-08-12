@@ -9,7 +9,7 @@
 // API CONFIGURATION
 // =========================================================
 
-const OCR_API_URL = "http://127.0.0.1:8000/ocr";
+const OCR_API_URL = "https://client-capture-ocr-api.onrender.com/ocr";
 
 
 // =========================================================
