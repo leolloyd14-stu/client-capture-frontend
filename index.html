@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Client Data</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="capture-card" aria-labelledby="page-title">
+            <div class="card-header">
+                <h1 id="page-title">Capture Client Data - NMYUNNY7HXG</h1>
+            </div>
+
+            <div id="successMessage" class="alert success" role="status" aria-live="polite">
+                Data captured successfully.
+            </div>
+
+
+            <section class="camera-section" aria-labelledby="camera-title">
+                <div class="camera-section-header">
+                    <div>
+                        <h2 id="camera-title">Document Camera</h2>
+                        <p>Capture the completed paper form before OCR extraction.</p>
+                    </div>
+                    <div class="camera-source-actions">
+                        <button id="openCameraBtn" type="button" class="secondary-btn">OPEN CAMERA</button>
+                        <button id="uploadPhotoBtn" type="button" class="secondary-btn">UPLOAD PHOTO</button>
+                        <input id="photoUploadInput" type="file" accept="image/*" hidden>
+                    </div>
+                </div>
+
+                <div id="cameraStatus" class="camera-status" role="status" aria-live="polite">
+                    Loading camera controls...
+                </div>
+
+                <div id="cameraWorkspace" class="camera-workspace" hidden>
+                    <div class="camera-frame">
+                        <video id="cameraPreview" autoplay playsinline muted></video>
+                        <canvas id="captureCanvas" hidden></canvas>
+                        <img id="capturedImage" alt="Captured document preview" hidden>
+                    </div>
+
+                    <div id="qualityPanel" class="quality-panel" hidden>
+                        <div class="quality-panel-header">
+                            <div>
+                                <h3>Document Image Quality</h3>
+                                <p>Automatic checks before OCR.</p>
+                            </div>
+                            <div id="qualityBadge" class="quality-badge">NOT CHECKED</div>
+                        </div>
+
+                        <div class="quality-grid">
+                            <div class="quality-item"><span>Resolution</span><strong id="resolutionResult">—</strong></div>
+                            <div class="quality-item"><span>Sharpness</span><strong id="sharpnessResult">—</strong></div>
+                            <div class="quality-item"><span>Brightness</span><strong id="brightnessResult">—</strong></div>
+                            <div class="quality-item"><span>Overexposure</span><strong id="exposureResult">—</strong></div>
+                        </div>
+
+                        <div id="qualitySummary" class="quality-summary"></div>
+                    </div>
+
+                    <div id="documentProcessingPanel" class="document-processing-panel" hidden>
+                        <div class="processing-panel-header">
+                            <div>
+                                <h3>Document Processing</h3>
+                                <p>Boundary detection, crop, perspective correction and deskew.</p>
+                            </div>
+                            <div id="documentProcessingBadge" class="quality-badge">NOT PROCESSED</div>
+                        </div>
+
+                        <div class="document-comparison">
+                            <div class="document-preview-box">
+                                <span class="preview-label">Captured image</span>
+                                <img id="sourceDocumentPreview" alt="Original captured document">
+                            </div>
+
+                            <div class="document-preview-box">
+                                <span class="preview-label">Corrected document</span>
+                                <canvas id="processedDocumentCanvas"></canvas>
+                            </div>
+                        </div>
+
+                        <div id="documentProcessingSummary" class="quality-summary"></div>
+                    </div>
+
+                    <div class="camera-actions">
+                        <button id="capturePhotoBtn" type="button" class="capture-btn">CAPTURE PHOTO</button>
+                        <button id="retakePhotoBtn" type="button" class="secondary-btn" hidden>RETAKE</button>
+                        <button id="usePhotoBtn" type="button" class="secondary-btn" hidden disabled>USE IMAGE</button>
+                        <button id="closeCameraBtn" type="button" class="text-btn">CLOSE CAMERA</button>
+                    </div>
+                </div>
+            </section>
+
+            <form id="clientCaptureForm" novalidate>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="ownerName">Owner Name</label>
+                        <div class="input-wrap">
+                            <span class="icon">👤</span>
+                            <input id="ownerName" name="ownerName" type="text" placeholder="Name of Owner" required>
+                        </div>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="idType">Id Type</label>
+                        <select id="idType" name="idType" required>
+                            <option value="">Select ID Type</option>
+                            <option>Ghana Card</option>
+                            <option>Passport</option>
+                            <option>Driver's Licence</option>
+                            <option>Voter ID</option>
+                        </select>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobileNumber">Mobile Number</label>
+                        <div class="input-wrap">
+                            <span class="icon">📱</span>
+                            <input id="mobileNumber" name="mobileNumber" type="tel" placeholder="Mobile Number" required>
+                        </div>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="idNumber">Id Number</label>
+                        <div class="input-wrap">
+                            <span class="icon">👤</span>
+                            <input id="idNumber" name="idNumber" type="text" placeholder="ID Number" required>
+                        </div>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <div class="input-wrap">
+                            <span class="icon">👤</span>
+                            <input id="email" name="email" type="email" placeholder="Email" required>
+                        </div>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issuingDate">Issuing Date</label>
+                        <input id="issuingDate" name="issuingDate" type="date" required>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <div class="input-wrap">
+                            <span class="icon">✈</span>
+                            <input id="address" name="address" type="text" placeholder="Address" required>
+                        </div>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expiringDate">Expiring Date</label>
+                        <input id="expiringDate" name="expiringDate" type="date" required>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nationality">Nationality</label>
+                        <select id="nationality" name="nationality" required>
+                            <option value="">Select Nationality</option>
+                            <option>Ghanaian</option>
+                            <option>Nigerian</option>
+                            <option>Ivorian</option>
+                            <option>Togolese</option>
+                            <option>Burkinabé</option>
+                            <option>Other</option>
+                        </select>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="union">Union</label>
+                        <select id="union" name="union" required>
+                            <option value="">Select Union</option>
+                            <option>Union 1</option>
+                            <option>Union 2</option>
+                            <option>Union 3</option>
+                        </select>
+                        <small class="error"></small>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="capture-btn">CAPTURE DATA</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script async src="https://docs.opencv.org/4.x/opencv.js" onload="window.opencvScriptLoaded = true;"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
