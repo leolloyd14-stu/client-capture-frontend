@@ -6,6 +6,13 @@ import re
 import cv2
 import numpy as np
 
+import os
+
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from paddleocr import PaddleOCR
@@ -55,10 +62,13 @@ async def lifespan(app: FastAPI):
     print("Loading PaddleOCR...")
 
     ocr_engine = PaddleOCR(
-        use_doc_orientation_classify=False,
-        use_doc_unwarping=False,
-        use_textline_orientation=False,
-    )
+    text_detection_model_name="PP-OCRv6_small_det",
+    text_recognition_model_name="PP-OCRv6_small_rec",
+
+    use_doc_orientation_classify=False,
+    use_doc_unwarping=False,
+    use_textline_orientation=False,
+)
 
     print("PaddleOCR loaded successfully.")
 
@@ -90,7 +100,7 @@ app.add_middleware(
     allow_origins=[
         "http://127.0.0.1:5500",
         "http://localhost:5500",
-        "https://leolloyd14-stu.github.io/client-capture-frontend/", 
+        "https://leolloyd14-stu.github.io", 
     ],
     allow_credentials=True,
     allow_methods=[
@@ -122,6 +132,9 @@ async def health():
         "ocr_ready": ocr_engine is not None,
     }
 
+@app.head("/")
+async def root_head():
+    return
 
 # =========================================================
 # BASIC TEXT NORMALIZATION
@@ -1136,6 +1149,28 @@ def map_rows_to_fields(
 # OCR ENDPOINT
 # =========================================================
 
+def resize_for_ocr(
+    image: np.ndarray,
+    max_width: int = 1400,
+) -> np.ndarray:
+
+    height, width = image.shape[:2]
+
+    if width <= max_width:
+        return image
+
+    scale = max_width / width
+
+    new_width = int(width * scale)
+    new_height = int(height * scale)
+
+    return cv2.resize(
+        image,
+        (new_width, new_height),
+        interpolation=cv2.INTER_AREA,
+    )
+
+
 @app.post("/ocr")
 async def extract_text(
     image: UploadFile = File(...)
@@ -1217,17 +1252,15 @@ async def extract_text(
                 "OCR engine is not ready."
             ),
         )
-
-
     # =====================================================
     # PADDLEOCR
     # =====================================================
 
     try:
-        results = (
-            ocr_engine.predict(
-                decoded_image
-            )
+        ocr_image = resize_for_ocr(decoded_image)
+
+        results = ocr_engine.predict(
+            ocr_image
         )
 
     except Exception as error:
