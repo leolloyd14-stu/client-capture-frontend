@@ -59,18 +59,29 @@ MAX_IMAGE_SIZE_BYTES = (
 async def lifespan(app: FastAPI):
     global ocr_engine
 
-    print("Loading PaddleOCR...")
+    DET_MODEL = "PP-OCRv6_small_det"
+    REC_MODEL = "PP-OCRv6_small_rec"
+
+    print("=" * 70)
+    print("STARTING CLIENT CAPTURE OCR API")
+    print(f"Detection model   : {DET_MODEL}")
+    print(f"Recognition model : {REC_MODEL}")
+    print("Render profile    : LOW MEMORY")
+    print("=" * 70)
 
     ocr_engine = PaddleOCR(
-    text_detection_model_name="PP-OCRv6_small_det",
-    text_recognition_model_name="PP-OCRv6_small_rec",
+        text_detection_model_name=DET_MODEL,
+        text_recognition_model_name=REC_MODEL,
+        use_doc_orientation_classify=False,
+        use_doc_unwarping=False,
+        use_textline_orientation=False,
+    )
 
-    use_doc_orientation_classify=False,
-    use_doc_unwarping=False,
-    use_textline_orientation=False,
-)
-
+    print("=" * 70)
     print("PaddleOCR loaded successfully.")
+    print(f"Detection model   : {DET_MODEL}")
+    print(f"Recognition model : {REC_MODEL}")
+    print("=" * 70)
 
     yield
 
